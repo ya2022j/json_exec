@@ -1,0 +1,23 @@
+{
+            "username":"ri",
+            "age":18
+}
+
+
+
+{
+  "list": [
+    {
+      "id": 1,
+      "value": 1,
+      "label": "动态选项1",
+      "children": [
+        {
+          "id": 2,
+          "value": 2,
+          "label": "动态选项1-1"
+        }
+      ]
+    }
+  ]
+}
