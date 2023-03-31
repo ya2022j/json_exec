@@ -7,7 +7,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"time"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/tidwall/gjson"
 )
@@ -69,16 +71,27 @@ func readjsonfile(jsonfile string) (result interface{}) {
 
 }
 
+func Cors() gin.HandlerFunc {
+	c := cors.Config{
+		AllowAllOrigins: true,
+		AllowMethods:    []string{"GET", "POST", "PUT", "DELETE", "PATCH"},
+		AllowHeaders:    []string{"Content-Type", "Access-Token", "Authorization"},
+		MaxAge:          6 * time.Hour,
+	}
+
+	return cors.New(c)
+}
+
 func main() {
 
-	result := readjsonfile("dt.json")
+	result := readjsonfile("ForelemetUI_jp_zipCode_city.json")
 	router := gin.Default()
-
+	router.Use(cors.Default())
 	router.GET("/", func(c *gin.Context) {
 		c.PureJSON(200, result)
 
 	})
 
-	router.Run(":8888")
+	router.Run(":8003")
 
 }
