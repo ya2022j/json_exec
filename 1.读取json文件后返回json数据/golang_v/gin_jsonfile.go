@@ -1,10 +1,12 @@
 package main
 
-// dt.json ==>
+// dt.json ==>string==> json array==>
 // GoLang结构体解析多维复杂json  https://blog.csdn.net/qq_38883889/article/details/109559380
+
 import (
+	"encoding/json"
+	"fmt"
 	"io/ioutil"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/tidwall/gjson"
@@ -16,12 +18,24 @@ func CheckError(err error) {
 	}
 }
 
-func ReadJsonfile(filename string) string {
-	content, err := ioutil.ReadFile(filename)
-	CheckError(err)
-	return string(content)
+// 嵌套结构体
+type Top struct {
+	List []List `json:"list"`
 }
 
+type List struct {
+	Id       int64      `json:"id"`
+	Value    int64      `json:"value"`
+	Label    string     `json:"label"`
+	Children []Children `json:"children"`
+}
+
+type Children struct {
+	Id      int64  `json:"id"`
+	Value   int64  `json:"value"`
+	Label   string `json:"label"`
+	ZipCode string `json:"zip_code"`
+}
 
 func ReturnJSONString(container string, item string) string {
 	json_ret := gjson.Get(container, item)
@@ -29,16 +43,42 @@ func ReturnJSONString(container string, item string) string {
 	return value
 }
 
-func main() {
-	ret := ReadJsonfile("dt.json")
-	router := gin.Default()
-	router.GET("/", func(c *gin.Context) {
-		data := map[string]interface{}{
+func readjsonfile(jsonfile string) (result interface{}) {
 
-			"username": ReturnJSONString(ret, "username"),
-			"age":      ReturnJSONString(ret, "age"),
-		}
-		c.JSON(http.StatusOK, data)
+	content, err := ioutil.ReadFile(jsonfile)
+	CheckError(err)
+
+	// var str_content string
+	string_result := string(content)
+
+	// for_gin_json := map[string]interface{}{"json_result": result}
+
+	//string--->json array
+
+	// var data Nikki225
+	var data Top
+	// var data []map[string]interface{}
+	if err := json.Unmarshal([]byte(string_result), &data); err == nil {
+
+		return data
+		//fmt.Println(dat["status"])
+	} else {
+		fmt.Println(err)
+	}
+	return
+
+}
+
+func main() {
+
+	result := readjsonfile("dt.json")
+	router := gin.Default()
+
+	router.GET("/", func(c *gin.Context) {
+		c.PureJSON(200, result)
+
 	})
+
 	router.Run(":8888")
+
 }
