@@ -30,11 +30,10 @@ def all_app_info():
     ret = read_file("dt.json")
     response = jsonify(ret)
     response.headers["Access-Control-Allow-Origin"] = "*"
-    return response
+    response.headers["Content-Type"] = "application/json; charset=utf-8"  #  要确保返回的内容是json
+    return ret
 
 
 
 if __name__ == '__main__':
-    app.run(debug=True,port=8003)
-
-
+    app.run(debug=True,host="192.168.84.184",port=8003)
